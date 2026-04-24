@@ -17,7 +17,7 @@ https://docs.google.com/document/d/1FAovQSotejWLA-u_0JGnl0xdyhdgzzoTcyaAwpb9CkE/
 ## Tech Stack
 <!-- REVIEW: React (TypeScript), Tailwind CSS -->
 * **Frontend:** TBD
-<!-- REVIEW: Supabase (Auth/Database) --> -->
+<!-- REVIEW: Supabase (Auth/Database) -->
 * **Backend:** TBD
 <!-- REVIEW: OpenAI API / Gemini API -->
 * **AI/Orchestration:** TBD
