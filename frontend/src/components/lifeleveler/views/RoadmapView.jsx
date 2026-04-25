@@ -22,6 +22,7 @@ export default function RoadmapView() {
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState({ title: "", deadline: "", description: "" });
 
+  
   const done = milestones.filter((m) => m.state === "done").length;
   const pct = Math.round((done / milestones.length) * 100);
 
