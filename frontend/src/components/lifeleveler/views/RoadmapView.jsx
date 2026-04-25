@@ -7,6 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { Plus } from "lucide-react";
 
 const dummyGoals = [
   { id: "1", title: "Reach LeetCode Hard" },
@@ -35,48 +36,33 @@ export default function RoadmapView() {
       </header>
 
 
-      <div className="gl-card p-4">
-        <div className="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          <span>5-year trajectory</span>
-          <span className="text-foreground">{pct}%</span>
-        </div>
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-          <div
-            className="h-full rounded-full bg-gradient-primary transition-all duration-700 ease-soft"
-            style={{ width: `${pct}%` }}
-          />
-        </div>
-      {/* </div>
+      <div className="py-4 flex items-center gap-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+  <span>Goal</span>
+  
+  <DropdownMenu>
+    <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-md border border-border px-3 py-1.5 text-foreground hover:bg-muted transition-colors">
+      {selectedGoal}
+    </DropdownMenuTrigger>
+    <DropdownMenuContent align="start">
+      {dummyGoals.map((goal) => (
+        <DropdownMenuItem
+          key={goal.id}
+          onClick={() => setSelectedGoal(goal.title)}
+          className="cursor-pointer"
+        >
+          {goal.title}
+        </DropdownMenuItem>
+      ))}
+    </DropdownMenuContent>
+  </DropdownMenu>
 
-      <div className="gl-card p-4"> */}
-        <div className="py-4 flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          <span>Goal</span>
-          <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-md border border-border px-3 py-1.5 text-foreground hover:bg-muted transition-colors">
-              {selectedGoal}
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              {dummyGoals.map((goal) => (
-                <DropdownMenuItem
-                  key={goal.id}
-                  onClick={() => setSelectedGoal(goal.title)}
-                  className="cursor-pointer"
-                >
-                  {goal.title}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
-          {/* <span className="text-foreground">{pct}%</span> */}
-        </div>
-        {/* <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-          <div
-            className="h-full rounded-full bg-gradient-primary transition-all duration-700 ease-soft"
-            style={{ width: `${pct}%` }}
-          />
-        </div> */}
-      </div>
+  <button 
+    className="inline-flex items-center justify-center rounded-md border border-border p-1.5 text-foreground hover:bg-muted transition-colors"
+    aria-label="Add new goal"
+  >
+    <Plus size={16} />
+  </button>
+</div>
 
       <MilestoneStepper milestones={milestones} />
     </div>
