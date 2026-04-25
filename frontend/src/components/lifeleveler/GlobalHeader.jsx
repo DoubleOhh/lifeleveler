@@ -1,16 +1,24 @@
 import { Flame, Zap } from "lucide-react";
+import logo from '../../../src/assets/ll-logo.png';
 
 export default function GlobalHeader({ player }) {
   const pct = Math.min(100, Math.round((player.xp / player.xpToNext) * 100));
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-xl items-center gap-3 px-4 py-3">
+      <div className="mx-auto flex max-w-xl items-center gap-2 px-4 py-2">
+        {/* Logo before level badge */}
+        <img 
+          src={logo} 
+          alt="Logo" 
+          className="h-20 w-auto shrink-0 rounded-lg" // Matches badge height, optional subtle rounding
+        />
+        
         {/* Level badge */}
         <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-primary text-primary-foreground font-extrabold shadow-[var(--shadow-glow)]">
           {player.level}
           <span className="absolute -bottom-1 -right-1 rounded-md bg-surface px-1 text-[9px] font-bold uppercase tracking-wider text-primary-glow border border-border">
-            Lv
+            Lvl
           </span>
         </div>
 
