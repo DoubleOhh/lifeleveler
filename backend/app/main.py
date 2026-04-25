@@ -4,10 +4,10 @@ from collections.abc import Generator
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
-from app import models
-from app.db import Base, SessionLocal, engine
-from app.schema import GoalCreate, GoalRead, TaskRead
-from app.services.taskgen import generate_tasks_for_goal
+from . import models
+from .db import Base, SessionLocal, engine
+from .schema import GoalCreate, GoalRead, TaskRead
+from .services.taskgen import generate_tasks_for_goal
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
