@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import MilestoneStepper from "../MilestoneStepper.jsx";
-import { milestones } from "@/data/mockData.js";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -9,29 +8,127 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Plus } from "lucide-react";
 
-const dummyGoals = [
-  { id: "1", title: "Reach LeetCode Hard" },
-  { id: "2", title: "Add 500 LinkedIn Contacts" },
-  { id: "3", title: "Build a portfolio website" },
-  { id: "4", title: "Master Python" },
-];
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const DEMO_USER_ID = 1;
+
+function formatGoalDeadline(deadline) {
+  if (!deadline) {
+    return "No deadline";
+  }
+
+  const parsedDate = new Date(deadline);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "No deadline";
+  }
+
+  return parsedDate.toLocaleDateString();
+}
 
 export default function RoadmapView() {
-  // 1. All hooks must be at the top level
-  const [selectedGoal, setSelectedGoal] = useState(dummyGoals[0].title);
+  const [goals, setGoals] = useState([]);
+  const [selectedGoalId, setSelectedGoalId] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState({ title: "", deadline: "", description: "" });
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadGoals = async () => {
+      try {
+        setIsLoading(true);
+        setError("");
+
+        const response = await fetch(`${API_BASE_URL}/users/${DEMO_USER_ID}/goals`);
+        if (!response.ok) {
+          throw new Error("Unable to load roadmap goals.");
+        }
+
+        const data = await response.json();
+        if (!isMounted) {
+          return;
+        }
+
+        setGoals(data);
+        setSelectedGoalId((currentSelectedGoalId) =>
+          currentSelectedGoalId ?? data[0]?.id ?? null
+        );
+      } catch (loadError) {
+        if (isMounted) {
+          setError(loadError.message || "Unable to load roadmap goals.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadGoals();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const milestones = useMemo(
+    () =>
+      goals.map((goal) => ({
+        id: goal.id,
+        title: goal.title,
+        horizon: formatGoalDeadline(goal.deadline),
+        state: goal.state,
+      })),
+    [goals]
+  );
+
+  const selectedGoal = useMemo(
+    () => goals.find((goal) => goal.id === selectedGoalId) ?? null,
+    [goals, selectedGoalId]
+  );
+
   const done = milestones.filter((m) => m.state === "done").length;
-  const pct = Math.round((done / milestones.length) * 100);
+  const pct = milestones.length ? Math.round((done / milestones.length) * 100) : 0;
 
-  // 2. Form handler
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("New Goal Submitted:", formData);
-    setIsAdding(false);
-    setFormData({ title: "", deadline: "", description: "" });
+
+    try {
+      setIsSubmitting(true);
+      setError("");
+
+      const response = await fetch(`${API_BASE_URL}/goals`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          user_id: DEMO_USER_ID,
+          title: formData.title,
+          description: formData.description,
+          deadline: formData.deadline ? new Date(formData.deadline).toISOString() : null,
+          category: "career",
+          state: "upcoming",
+          progress_percent: 0,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to create goal.");
+      }
+
+      const createdGoal = await response.json();
+      setGoals((prevGoals) => [...prevGoals, createdGoal]);
+      setSelectedGoalId(createdGoal.id);
+      setIsAdding(false);
+      setFormData({ title: "", deadline: "", description: "" });
+    } catch (submitError) {
+      setError(submitError.message || "Unable to create goal.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -53,13 +150,13 @@ export default function RoadmapView() {
         <span>Goal</span>
         <DropdownMenu>
           <DropdownMenuTrigger className="inline-flex items-center justify-center rounded-md border border-border px-3 py-1.5 text-foreground hover:bg-muted transition-colors">
-            {selectedGoal}
+            {selectedGoal?.title ?? "No goals yet"}
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            {dummyGoals.map((goal) => (
+            {goals.map((goal) => (
               <DropdownMenuItem
                 key={goal.id}
-                onClick={() => setSelectedGoal(goal.title)}
+                onClick={() => setSelectedGoalId(goal.id)}
                 className="cursor-pointer"
               >
                 {goal.title}
@@ -77,7 +174,12 @@ export default function RoadmapView() {
         </button>
       </div>
 
-      {/* Conditional Form */}
+      {error && (
+        <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {error}
+        </p>
+      )}
+
       {isAdding && (
         <form
           onSubmit={handleSubmit}
@@ -123,15 +225,20 @@ export default function RoadmapView() {
             </button>
             <button
               type="submit"
+              disabled={isSubmitting}
               className="px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-md hover:opacity-90"
             >
-              Submit
+              {isSubmitting ? "Submitting..." : "Submit"}
             </button>
           </div>
         </form>
       )}
 
-      <MilestoneStepper milestones={milestones} />
+      {isLoading ? (
+        <div className="gl-card p-4 text-sm text-muted-foreground">Loading roadmap...</div>
+      ) : (
+        <MilestoneStepper milestones={milestones} />
+      )}
     </div>
   );
 }
