@@ -28,6 +28,21 @@ https://docs.google.com/document/d/1FAovQSotejWLA-u_0JGnl0xdyhdgzzoTcyaAwpb9CkE/
 
 ### Prerequisites
 
+
+### Temp Task Issues
+- User Creation
+   - Do you have a degree?
+   - Certifications?
+   - Is there a field you are interested in?
+   - What level of education do you want to pursue?
+   - Hobbies? Interests? Skills (1-5 proficiency)? 
+
+- Goal Creation
+   - where do you want to be in 5 years?
+   - what are your current top priorities?
+   - job? internship? skill development? resume? portfolio? interview? elevator pitch? networking?
+
+
 <!-- ### Stretch Goals -->
 <!-- * Node.js (v18+)
 * Supabase Project URL and Anon Key -->
